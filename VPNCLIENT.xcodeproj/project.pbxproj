@@ -167,6 +167,7 @@
 				A10000012C00000100000001 /* SharedConstants.swift */,
 				A10000022C00000100000001 /* IPCProtocol.swift */,
 				A10000032C00000100000001 /* ConfigGenerator.swift */,
+				A10000092C00000100000001 /* ServerConfig.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -207,7 +208,6 @@
 			children = (
 				A10000072C00000100000001 /* NetworkType.swift */,
 				A10000082C00000100000001 /* VPNState.swift */,
-				A10000092C00000100000001 /* ServerConfig.swift */,
 				A100000A2C00000100000001 /* Subscription.swift */,
 				A100000B2C00000100000001 /* RoutingRule.swift */,
 			);

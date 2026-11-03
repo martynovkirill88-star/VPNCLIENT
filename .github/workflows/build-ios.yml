@@ -1,22 +1,25 @@
-name: Build iOS VPNCLIENT
+name: Build & Release iOS IPA
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build:
-    name: Build & Test iOS App
+  build-ipa:
+    name: Build & Package iOS IPA
     runs-on: macos-14
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Select Xcode Version
+      - name: Setup Xcode Version
         run: |
           sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
           xcodebuild -version
@@ -29,32 +32,70 @@ jobs:
         run: |
           xcodegen generate
 
-      - name: Build VPNClientApp & PacketTunnel
+      - name: Build Application & Tunnel Extension
         run: |
           xcodebuild clean build \
             -project VPNCLIENT.xcodeproj \
             -scheme VPNClientApp \
+            -configuration Release \
             -destination "generic/platform=iOS" \
+            -derivedDataPath ./DerivedData \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            | xcbeautify || true
+            AD_HOC_CODE_SIGNING_ALLOWED=YES
 
-      - name: Archive Unsigned Build
+      - name: Package .IPA for iPhone
         run: |
-          mkdir -p build_output
-          xcodebuild archive \
-            -project VPNCLIENT.xcodeproj \
-            -scheme VPNClientApp \
-            -archivePath build_output/VPNCLIENT.xcarchive \
-            -destination "generic/platform=iOS" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" || true
+          echo "Packaging Payload into VPNCLIENT.ipa..."
+          mkdir -p Payload
+          
+          # Find the built .app
+          APP_PATH=$(find ./DerivedData/Build/Products/Release-iphoneos -name "*.app" -maxdepth 1 | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "❌ VPNClientApp.app not found in Release-iphoneos!"
+            exit 1
+          fi
+          
+          echo "Found app at $APP_PATH"
+          cp -R "$APP_PATH" Payload/
+          
+          # Zip into .ipa
+          zip -r -9 VPNCLIENT.ipa Payload
+          echo "✅ VPNCLIENT.ipa created successfully!"
+          ls -lh VPNCLIENT.ipa
 
-      - name: Upload Build Artifact
+      - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: VPNCLIENT-iOS-xcarchive
-          path: build_output/
-          if-no-files-found: warn
+          name: VPNCLIENT-iOS-IPA
+          path: VPNCLIENT.ipa
+          if-no-files-found: error
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+        with:
+          tag_name: v1.0.0
+          name: "VPNCLIENT iOS v1.0.0 (Release IPA)"
+          body: |
+            ### 🛡️ VPNCLIENT для iPhone (iOS 16+)
+            
+            Готовая сборка нативного VPN-клиента для iOS с поддержкой VLESS, Reality, SplitHTTP/XHTTP и Hysteria 2 Turbo.
+            
+            #### 🌟 Ключевые возможности:
+            - **🧠 Умный автовыбор Wi-Fi / LTE**:
+              - На сотовой сети (LTE/5G) автоматически направляет трафик через CDN-серверы (`🇷🇺 LTE 1, 2, 3`) для обхода замедлений YouTube.
+              - На Wi-Fi автоматически выбирает сервер с наименьшим пингом (`⚡ leastPing`).
+            - **⚡ Поддержка современных протоколов**: VLESS Reality, SplitHTTP, Hysteria 2, gRPC.
+            - **🎨 Стильный Cyber-Dark интерфейс**: спидометр, живой график, большая пульсирующая кнопка.
+            - **🇷🇺 Обход российских сайтов**: банки, Госуслуги, VK и Яндекс работают напрямую.
+            
+            #### 📲 Способы установки .ipa на iPhone:
+            1. **TrollStore** (для совместимых iOS версий): скачайте `VPNCLIENT.ipa` и откройте в TrollStore.
+            2. **Scarlet / Esign / Gbox** (установка прямо на телефоне через сертификат).
+            3. **AltStore / Sideloadly** (установка через кабель с компьютера Mac или Windows).
+          files: |
+            VPNCLIENT.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
