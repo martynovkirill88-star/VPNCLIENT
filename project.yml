@@ -1,0 +1,63 @@
+name: VPNCLIENT
+options:
+  bundleIdPrefix: com.vpnclient
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.4"
+  developmentLanguage: ru
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    ENABLE_PREVIEWS: YES
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  VPNClientApp:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: VPNClientApp
+      - path: Shared
+    info:
+      path: VPNClientApp/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: "VPNCLIENT"
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+    entitlements:
+      path: VPNClientApp/VPNClientApp.entitlements
+    dependencies:
+      - target: PacketTunnel
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.vpnclient.app
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+
+  PacketTunnel:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: PacketTunnel
+      - path: Shared
+    info:
+      path: PacketTunnel/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: "PacketTunnel"
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+    entitlements:
+      path: PacketTunnel/PacketTunnel.entitlements
+    frameworks:
+      - framework: NetworkExtension.framework
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.vpnclient.app.PacketTunnel
+        SKIP_INSTALL: YES

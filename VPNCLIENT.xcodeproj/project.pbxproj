@@ -1,0 +1,604 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10001012C00000100000001 /* SharedConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000012C00000100000001 /* SharedConstants.swift */; };
+		A10001022C00000100000001 /* IPCProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000022C00000100000001 /* IPCProtocol.swift */; };
+		A10001032C00000100000001 /* ConfigGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000032C00000100000001 /* ConfigGenerator.swift */; };
+		A10001042C00000100000001 /* VPNClientApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000042C00000100000001 /* VPNClientApp.swift */; };
+		A10001052C00000100000001 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000052C00000100000001 /* Colors.swift */; };
+		A10001062C00000100000001 /* Styles.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000062C00000100000001 /* Styles.swift */; };
+		A10001072C00000100000001 /* NetworkType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000072C00000100000001 /* NetworkType.swift */; };
+		A10001082C00000100000001 /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000082C00000100000001 /* VPNState.swift */; };
+		A10001092C00000100000001 /* ServerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000092C00000100000001 /* ServerConfig.swift */; };
+		A100010A2C00000100000001 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000A2C00000100000001 /* Subscription.swift */; };
+		A100010B2C00000100000001 /* RoutingRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000B2C00000100000001 /* RoutingRule.swift */; };
+		A100010C2C00000100000001 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000C2C00000100000001 /* NetworkMonitor.swift */; };
+		A100010D2C00000100000001 /* PingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000D2C00000100000001 /* PingManager.swift */; };
+		A100010E2C00000100000001 /* TrafficStatsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000E2C00000100000001 /* TrafficStatsManager.swift */; };
+		A100010F2C00000100000001 /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000F2C00000100000001 /* SubscriptionManager.swift */; };
+		A10001102C00000100000001 /* VPNManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000102C00000100000001 /* VPNManager.swift */; };
+		A10001112C00000100000001 /* SmartRoutingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000112C00000100000001 /* SmartRoutingManager.swift */; };
+		A10001122C00000100000001 /* PingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000122C00000100000001 /* PingIndicator.swift */; };
+		A10001132C00000100000001 /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000132C00000100000001 /* GlassCard.swift */; };
+		A10001142C00000100000001 /* PulseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000142C00000100000001 /* PulseButton.swift */; };
+		A10001152C00000100000001 /* ServerRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000152C00000100000001 /* ServerRow.swift */; };
+		A10001162C00000100000001 /* NetworkBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000162C00000100000001 /* NetworkBadgeView.swift */; };
+		A10001172C00000100000001 /* LiveTrafficChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000172C00000100000001 /* LiveTrafficChart.swift */; };
+		A10001182C00000100000001 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000182C00000100000001 /* DashboardView.swift */; };
+		A10001192C00000100000001 /* ServerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000192C00000100000001 /* ServerListView.swift */; };
+		A100011A2C00000100000001 /* ServerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100001A2C00000100000001 /* ServerDetailView.swift */; };
+		A100011B2C00000100000001 /* SmartRoutingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100001B2C00000100000001 /* SmartRoutingView.swift */; };
+		A100011C2C00000100000001 /* SubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100001C2C00000100000001 /* SubscriptionView.swift */; };
+		A100011D2C00000100000001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100001D2C00000100000001 /* SettingsView.swift */; };
+		A100011E2C00000100000001 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100001E2C00000100000001 /* MainTabView.swift */; };
+		A100011F2C00000100000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A100001F2C00000100000001 /* Assets.xcassets */; };
+		
+		/* PacketTunnel target build files */
+		A20001012C00000100000001 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000012C00000100000001 /* PacketTunnelProvider.swift */; };
+		A20001022C00000100000001 /* CoreTunnelBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000022C00000100000001 /* CoreTunnelBridge.swift */; };
+		A20001032C00000100000001 /* XrayConfigBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000032C00000100000001 /* XrayConfigBuilder.swift */; };
+		A20001042C00000100000001 /* SharedConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000012C00000100000001 /* SharedConstants.swift */; };
+		A20001052C00000100000001 /* IPCProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000022C00000100000001 /* IPCProtocol.swift */; };
+		A20001062C00000100000001 /* ServerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000092C00000100000001 /* ServerConfig.swift */; };
+		A20001072C00000100000001 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20000042C00000100000001 /* NetworkExtension.framework */; };
+		A20001082C00000100000001 /* PacketTunnel.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A20000002C00000100000001 /* PacketTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A10002002C00000100000001 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A20001082C00000100000001 /* PacketTunnel.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A10000002C00000100000001 /* VPNClientApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VPNClientApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000002C00000100000001 /* PacketTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PacketTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		
+		/* Shared */
+		A10000012C00000100000001 /* SharedConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedConstants.swift; sourceTree = "<group>"; };
+		A10000022C00000100000001 /* IPCProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCProtocol.swift; sourceTree = "<group>"; };
+		A10000032C00000100000001 /* ConfigGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigGenerator.swift; sourceTree = "<group>"; };
+		
+		/* VPNClientApp */
+		A10000042C00000100000001 /* VPNClientApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNClientApp.swift; sourceTree = "<group>"; };
+		A10000052C00000100000001 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		A10000062C00000100000001 /* Styles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Styles.swift; sourceTree = "<group>"; };
+		A10000072C00000100000001 /* NetworkType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkType.swift; sourceTree = "<group>"; };
+		A10000082C00000100000001 /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
+		A10000092C00000100000001 /* ServerConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerConfig.swift; sourceTree = "<group>"; };
+		A100000A2C00000100000001 /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
+		A100000B2C00000100000001 /* RoutingRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingRule.swift; sourceTree = "<group>"; };
+		A100000C2C00000100000001 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		A100000D2C00000100000001 /* PingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingManager.swift; sourceTree = "<group>"; };
+		A100000E2C00000100000001 /* TrafficStatsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrafficStatsManager.swift; sourceTree = "<group>"; };
+		A100000F2C00000100000001 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
+		A10000102C00000100000001 /* VPNManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNManager.swift; sourceTree = "<group>"; };
+		A10000112C00000100000001 /* SmartRoutingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartRoutingManager.swift; sourceTree = "<group>"; };
+		A10000122C00000100000001 /* PingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingIndicator.swift; sourceTree = "<group>"; };
+		A10000132C00000100000001 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
+		A10000142C00000100000001 /* PulseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseButton.swift; sourceTree = "<group>"; };
+		A10000152C00000100000001 /* ServerRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerRow.swift; sourceTree = "<group>"; };
+		A10000162C00000100000001 /* NetworkBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkBadgeView.swift; sourceTree = "<group>"; };
+		A10000172C00000100000001 /* LiveTrafficChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveTrafficChart.swift; sourceTree = "<group>"; };
+		A10000182C00000100000001 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		A10000192C00000100000001 /* ServerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerListView.swift; sourceTree = "<group>"; };
+		A100001A2C00000100000001 /* ServerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerDetailView.swift; sourceTree = "<group>"; };
+		A100001B2C00000100000001 /* SmartRoutingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartRoutingView.swift; sourceTree = "<group>"; };
+		A100001C2C00000100000001 /* SubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionView.swift; sourceTree = "<group>"; };
+		A100001D2C00000100000001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A100001E2C00000100000001 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		A100001F2C00000100000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A10000202C00000100000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000212C00000100000001 /* VPNClientApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VPNClientApp.entitlements; sourceTree = "<group>"; };
+		
+		/* PacketTunnel */
+		A20000012C00000100000001 /* PacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketTunnelProvider.swift; sourceTree = "<group>"; };
+		A20000022C00000100000001 /* CoreTunnelBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTunnelBridge.swift; sourceTree = "<group>"; };
+		A20000032C00000100000001 /* XrayConfigBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XrayConfigBuilder.swift; sourceTree = "<group>"; };
+		A20000042C00000100000001 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
+		A20000052C00000100000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A20000062C00000100000001 /* PacketTunnel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PacketTunnel.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A10003002C00000100000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A20003002C00000100000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A20001072C00000100000001 /* NetworkExtension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000012C00000100000001 = {
+			isa = PBXGroup;
+			children = (
+				A10000302C00000100000001 /* Shared */,
+				A10000402C00000100000001 /* VPNClientApp */,
+				A20000102C00000100000001 /* PacketTunnel */,
+				A00000022C00000100000001 /* Products */,
+				A00000032C00000100000001 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		A00000022C00000100000001 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000002C00000100000001 /* VPNClientApp.app */,
+				A20000002C00000100000001 /* PacketTunnel.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A00000032C00000100000001 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A20000042C00000100000001 /* NetworkExtension.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A10000302C00000100000001 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A10000012C00000100000001 /* SharedConstants.swift */,
+				A10000022C00000100000001 /* IPCProtocol.swift */,
+				A10000032C00000100000001 /* ConfigGenerator.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		A10000402C00000100000001 /* VPNClientApp */ = {
+			isa = PBXGroup;
+			children = (
+				A10000502C00000100000001 /* App */,
+				A10000602C00000100000001 /* Theme */,
+				A10000702C00000100000001 /* Models */,
+				A10000802C00000100000001 /* Managers */,
+				A10000902C00000100000001 /* Views */,
+				A10000A02C00000100000001 /* Resources */,
+				A10000212C00000100000001 /* VPNClientApp.entitlements */,
+			);
+			path = VPNClientApp;
+			sourceTree = "<group>";
+		};
+		A10000502C00000100000001 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A10000042C00000100000001 /* VPNClientApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A10000602C00000100000001 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				A10000052C00000100000001 /* Colors.swift */,
+				A10000062C00000100000001 /* Styles.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		A10000702C00000100000001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A10000072C00000100000001 /* NetworkType.swift */,
+				A10000082C00000100000001 /* VPNState.swift */,
+				A10000092C00000100000001 /* ServerConfig.swift */,
+				A100000A2C00000100000001 /* Subscription.swift */,
+				A100000B2C00000100000001 /* RoutingRule.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A10000802C00000100000001 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				A100000C2C00000100000001 /* NetworkMonitor.swift */,
+				A100000D2C00000100000001 /* PingManager.swift */,
+				A100000E2C00000100000001 /* TrafficStatsManager.swift */,
+				A100000F2C00000100000001 /* SubscriptionManager.swift */,
+				A10000102C00000100000001 /* VPNManager.swift */,
+				A10000112C00000100000001 /* SmartRoutingManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		A10000902C00000100000001 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A10000182C00000100000001 /* DashboardView.swift */,
+				A10000192C00000100000001 /* ServerListView.swift */,
+				A100001A2C00000100000001 /* ServerDetailView.swift */,
+				A100001B2C00000100000001 /* SmartRoutingView.swift */,
+				A100001C2C00000100000001 /* SubscriptionView.swift */,
+				A100001D2C00000100000001 /* SettingsView.swift */,
+				A100001E2C00000100000001 /* MainTabView.swift */,
+				A10000122C00000100000001 /* PingIndicator.swift */,
+				A10000132C00000100000001 /* GlassCard.swift */,
+				A10000142C00000100000001 /* PulseButton.swift */,
+				A10000152C00000100000001 /* ServerRow.swift */,
+				A10000162C00000100000001 /* NetworkBadgeView.swift */,
+				A10000172C00000100000001 /* LiveTrafficChart.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A10000A02C00000100000001 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A100001F2C00000100000001 /* Assets.xcassets */,
+				A10000202C00000100000001 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A20000102C00000100000001 /* PacketTunnel */ = {
+			isa = PBXGroup;
+			children = (
+				A20000012C00000100000001 /* PacketTunnelProvider.swift */,
+				A20000022C00000100000001 /* CoreTunnelBridge.swift */,
+				A20000032C00000100000001 /* XrayConfigBuilder.swift */,
+				A20000052C00000100000001 /* Info.plist */,
+				A20000062C00000100000001 /* PacketTunnel.entitlements */,
+			);
+			path = PacketTunnel;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000002C00000000000001 /* VPNClientApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10004002C00000100000001 /* Build configuration list for PBXNativeTarget "VPNClientApp" */;
+			buildPhases = (
+				A10005002C00000100000001 /* Sources */,
+				A10003002C00000100000001 /* Frameworks */,
+				A10006002C00000100000001 /* Resources */,
+				A10002002C00000100000001 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A10007002C00000100000001 /* PBXTargetDependency */,
+			);
+			name = VPNClientApp;
+			productName = VPNClientApp;
+			productReference = A10000002C00000100000001 /* VPNClientApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A20000002C00000000000001 /* PacketTunnel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A20004002C00000100000001 /* Build configuration list for PBXNativeTarget "PacketTunnel" */;
+			buildPhases = (
+				A20005002C00000100000001 /* Sources */,
+				A20003002C00000100000001 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PacketTunnel;
+			productName = PacketTunnel;
+			productReference = A20000002C00000100000001 /* PacketTunnel.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000002C00000100000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					A10000002C00000000000001 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					A20000002C00000000000001 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = A00004002C00000100000001 /* Build configuration list for PBXProject "VPNCLIENT" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = ru;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				ru,
+				Base,
+			);
+			mainGroup = A00000012C00000100000001;
+			productRefGroup = A00000022C00000100000001 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A10000002C00000000000001 /* VPNClientApp */,
+				A20000002C00000000000001 /* PacketTunnel */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A10006002C00000100000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100011F2C00000100000001 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A10005002C00000100000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10001012C00000100000001 /* SharedConstants.swift in Sources */,
+				A10001022C00000100000001 /* IPCProtocol.swift in Sources */,
+				A10001032C00000100000001 /* ConfigGenerator.swift in Sources */,
+				A10001042C00000100000001 /* VPNClientApp.swift in Sources */,
+				A10001052C00000100000001 /* Colors.swift in Sources */,
+				A10001062C00000100000001 /* Styles.swift in Sources */,
+				A10001072C00000100000001 /* NetworkType.swift in Sources */,
+				A10001082C00000100000001 /* VPNState.swift in Sources */,
+				A10001092C00000100000001 /* ServerConfig.swift in Sources */,
+				A100010A2C00000100000001 /* Subscription.swift in Sources */,
+				A100010B2C00000100000001 /* RoutingRule.swift in Sources */,
+				A100010C2C00000100000001 /* NetworkMonitor.swift in Sources */,
+				A100010D2C00000100000001 /* PingManager.swift in Sources */,
+				A100010E2C00000100000001 /* TrafficStatsManager.swift in Sources */,
+				A100010F2C00000100000001 /* SubscriptionManager.swift in Sources */,
+				A10001102C00000100000001 /* VPNManager.swift in Sources */,
+				A10001112C00000100000001 /* SmartRoutingManager.swift in Sources */,
+				A10001122C00000100000001 /* PingIndicator.swift in Sources */,
+				A10001132C00000100000001 /* GlassCard.swift in Sources */,
+				A10001142C00000100000001 /* PulseButton.swift in Sources */,
+				A10001152C00000100000001 /* ServerRow.swift in Sources */,
+				A10001162C00000100000001 /* NetworkBadgeView.swift in Sources */,
+				A10001172C00000100000001 /* LiveTrafficChart.swift in Sources */,
+				A10001182C00000100000001 /* DashboardView.swift in Sources */,
+				A10001192C00000100000001 /* ServerListView.swift in Sources */,
+				A100011A2C00000100000001 /* ServerDetailView.swift in Sources */,
+				A100011B2C00000100000001 /* SmartRoutingView.swift in Sources */,
+				A100011C2C00000100000001 /* SubscriptionView.swift in Sources */,
+				A100011D2C00000100000001 /* SettingsView.swift in Sources */,
+				A100011E2C00000100000001 /* MainTabView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A20005002C00000100000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A20001012C00000100000001 /* PacketTunnelProvider.swift in Sources */,
+				A20001022C00000100000001 /* CoreTunnelBridge.swift in Sources */,
+				A20001032C00000100000001 /* XrayConfigBuilder.swift in Sources */,
+				A20001042C00000100000001 /* SharedConstants.swift in Sources */,
+				A20001052C00000100000001 /* IPCProtocol.swift in Sources */,
+				A20001062C00000100000001 /* ServerConfig.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A10007002C00000100000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A20000002C00000000000001 /* PacketTunnel */;
+			targetProxy = A10008002C00000100000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		A10008002C00000100000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A00000002C00000100000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A20000002C00000000000001;
+			remoteInfo = PacketTunnel;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin XCBuildConfiguration section */
+		A00004012C00000100000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		A00004022C00000100000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A10004012C00000100000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = VPNClientApp/VPNClientApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = VPNClientApp/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vpnclient.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A10004022C00000100000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = VPNClientApp/VPNClientApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = VPNClientApp/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vpnclient.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A20004012C00000100000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PacketTunnel/PacketTunnel.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PacketTunnel/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vpnclient.app.PacketTunnel;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A20004022C00000100000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PacketTunnel/PacketTunnel.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PacketTunnel/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vpnclient.app.PacketTunnel;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A00004002C00000100000001 /* Build configuration list for PBXProject "VPNCLIENT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00004012C00000100000001 /* Debug */,
+				A00004022C00000100000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10004002C00000100000001 /* Build configuration list for PBXNativeTarget "VPNClientApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10004012C00000100000001 /* Debug */,
+				A10004022C00000100000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A20004002C00000100000001 /* Build configuration list for PBXNativeTarget "PacketTunnel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A20004012C00000100000001 /* Debug */,
+				A20004022C00000100000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A00000002C00000100000001 /* Project object */;
+}

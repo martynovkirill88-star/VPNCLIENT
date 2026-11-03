@@ -1,0 +1,60 @@
+name: Build iOS VPNCLIENT
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Test iOS App
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: |
+          brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: |
+          xcodegen generate
+
+      - name: Build VPNClientApp & PacketTunnel
+        run: |
+          xcodebuild clean build \
+            -project VPNCLIENT.xcodeproj \
+            -scheme VPNClientApp \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            | xcbeautify || true
+
+      - name: Archive Unsigned Build
+        run: |
+          mkdir -p build_output
+          xcodebuild archive \
+            -project VPNCLIENT.xcodeproj \
+            -scheme VPNClientApp \
+            -archivePath build_output/VPNCLIENT.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" || true
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VPNCLIENT-iOS-xcarchive
+          path: build_output/
+          if-no-files-found: warn
