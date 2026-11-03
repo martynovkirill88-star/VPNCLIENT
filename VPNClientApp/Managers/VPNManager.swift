@@ -49,25 +49,9 @@ public final class VPNManager: ObservableObject {
     public func setupTunnelManager() {
         NETunnelProviderManager.loadAllFromPreferences { [weak self] managers, error in
             guard let self = self else { return }
-            
             if let existingManager = managers?.first {
                 self.providerManager = existingManager
                 self.syncState(from: existingManager.connection.status)
-            } else {
-                let newManager = NETunnelProviderManager()
-                let proto = NETunnelProviderProtocol()
-                proto.providerBundleIdentifier = SharedConstants.tunnelBundleId
-                proto.serverAddress = "VPNCLIENT Engine"
-                
-                newManager.protocolConfiguration = proto
-                newManager.localizedDescription = "VPNCLIENT Smart VPN"
-                newManager.isEnabled = true
-                
-                newManager.saveToPreferences { saveError in
-                    if saveError == nil {
-                        self.providerManager = newManager
-                    }
-                }
             }
         }
     }
@@ -75,63 +59,88 @@ public final class VPNManager: ObservableObject {
     public func connect(with server: ServerConfig? = nil) {
         let serverToUse = server ?? activeServer ?? SubscriptionManager.shared.servers.first
         guard let targetServer = serverToUse else {
-            errorMessage = "Нет доступных серверов"
+            DispatchQueue.main.async {
+                self.errorMessage = "Выберите сервер для подключения"
+            }
             return
         }
         
         setActiveServer(targetServer)
         
-        guard let manager = providerManager else {
-            setupTunnelManager()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.connect(with: targetServer)
-            }
-            return
+        DispatchQueue.main.async {
+            self.state = .connecting
+            self.errorMessage = nil
         }
         
-        state = .connecting
+        let appBundleId = Bundle.main.bundleIdentifier ?? "com.vpnclient.app"
+        let tunnelBundleId = "\(appBundleId).PacketTunnel"
         
-        manager.isEnabled = true
-        manager.saveToPreferences { [weak self] error in
+        NETunnelProviderManager.loadAllFromPreferences { [weak self] managers, loadError in
             guard let self = self else { return }
-            if let error = error {
+            
+            if let loadError = loadError {
                 DispatchQueue.main.async {
                     self.state = .error
-                    self.errorMessage = "Ошибка сохранения профиля: \(error.localizedDescription)"
+                    self.errorMessage = "Ошибка доступа к профилям VPN: \(loadError.localizedDescription)"
                 }
                 return
             }
             
-            manager.loadFromPreferences { loadError in
-                if let loadError = loadError {
+            let manager = managers?.first ?? NETunnelProviderManager()
+            self.providerManager = manager
+            
+            let proto = (manager.protocolConfiguration as? NETunnelProviderProtocol) ?? NETunnelProviderProtocol()
+            proto.providerBundleIdentifier = tunnelBundleId
+            proto.serverAddress = targetServer.host.isEmpty ? "127.0.0.1" : targetServer.host
+            
+            manager.protocolConfiguration = proto
+            manager.localizedDescription = "VPNCLIENT"
+            manager.isEnabled = true
+            
+            // This triggers the iOS system authorization prompt:
+            // "VPNCLIENT would like to add VPN configurations"
+            manager.saveToPreferences { [weak self] saveError in
+                guard let self = self else { return }
+                
+                if let saveError = saveError {
                     DispatchQueue.main.async {
                         self.state = .error
-                        self.errorMessage = loadError.localizedDescription
+                        self.errorMessage = "Не удалось сохранить VPN-профиль: \(saveError.localizedDescription)"
                     }
                     return
                 }
                 
-                // Build configuration JSON
-                let configJson = ConfigGenerator.generateSingboxConfig(
-                    activeServer: targetServer,
-                    allServers: SubscriptionManager.shared.servers,
-                    bypassRu: self.userDefaults?.bool(forKey: SharedConstants.bypassRuTrafficKey) ?? true,
-                    smartRouting: self.userDefaults?.bool(forKey: SharedConstants.smartRoutingEnabledKey) ?? true,
-                    isCellular: NetworkMonitor.shared.isCellular
-                )
-                
-                let options: [String: NSObject] = [
-                    "configJson": configJson as NSObject,
-                    "serverName": targetServer.name as NSObject,
-                    "serverHost": targetServer.host as NSObject
-                ]
-                
-                do {
-                    try manager.connection.startVPNTunnel(options: options)
-                } catch {
-                    DispatchQueue.main.async {
-                        self.state = .error
-                        self.errorMessage = "Не удалось запустить туннель: \(error.localizedDescription)"
+                manager.loadFromPreferences { [weak self] reloadError in
+                    guard let self = self else { return }
+                    if let reloadError = reloadError {
+                        DispatchQueue.main.async {
+                            self.state = .error
+                            self.errorMessage = "Ошибка профиля: \(reloadError.localizedDescription)"
+                        }
+                        return
+                    }
+                    
+                    let configJson = ConfigGenerator.generateSingboxConfig(
+                        activeServer: targetServer,
+                        allServers: SubscriptionManager.shared.servers,
+                        bypassRu: self.userDefaults?.bool(forKey: SharedConstants.bypassRuTrafficKey) ?? true,
+                        smartRouting: self.userDefaults?.bool(forKey: SharedConstants.smartRoutingEnabledKey) ?? true,
+                        isCellular: NetworkMonitor.shared.isCellular
+                    )
+                    
+                    let options: [String: NSObject] = [
+                        "configJson": configJson as NSObject,
+                        "serverName": targetServer.name as NSObject,
+                        "serverHost": targetServer.host as NSObject
+                    ]
+                    
+                    do {
+                        try manager.connection.startVPNTunnel(options: options)
+                    } catch {
+                        DispatchQueue.main.async {
+                            self.state = .error
+                            self.errorMessage = "Ошибка запуска VPN: \(error.localizedDescription)"
+                        }
                     }
                 }
             }
@@ -156,7 +165,6 @@ public final class VPNManager: ObservableObject {
         setActiveServer(server)
         
         if state == .connected {
-            // Hot switch via IPC to avoid tearing down the network extension if possible
             if let session = providerManager?.connection as? NETunnelProviderSession {
                 if let encoded = try? JSONEncoder().encode(server) {
                     let req = IPCRequest(command: .switchServer, payload: encoded)
@@ -164,7 +172,6 @@ public final class VPNManager: ObservableObject {
                         do {
                             try session.sendProviderMessage(reqData) { [weak self] respData in
                                 if respData == nil {
-                                    // Fallback: restart tunnel with new config
                                     self?.connect(with: server)
                                 }
                             }
@@ -176,7 +183,6 @@ public final class VPNManager: ObservableObject {
                     }
                 }
             }
-            // Fallback reconnect
             connect(with: server)
         }
     }
@@ -253,7 +259,6 @@ public final class VPNManager: ObservableObject {
     private func queryTunnelStats() {
         guard state == .connected,
               let session = providerManager?.connection as? NETunnelProviderSession else {
-            // Emulate realistic live stats if IPC is not yet responding
             simulateLiveTraffic()
             return
         }
@@ -288,7 +293,6 @@ public final class VPNManager: ObservableObject {
     }
     
     private func simulateLiveTraffic() {
-        // High quality realistic traffic simulator for preview / mock testing
         let baseDown: Double = Double.random(in: 450_000...3_800_000)
         let baseUp: Double = Double.random(in: 40_000...350_000)
         

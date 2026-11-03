@@ -15,7 +15,7 @@ public struct ServerRow: View {
         Button(action: onSelect) {
             HStack(spacing: 12) {
                 // Flag / Group Icon
-                Text(server.countryCode == "RU" ? "🇷🇺" : (server.countryCode == "DE" ? "🇩🇪" : (server.countryCode == "NL" ? "🇳🇱" : "🌐")))
+                Text(server.countryFlag)
                     .font(.system(size: 26))
                     .frame(width: 38, height: 38)
                     .background(AppColors.cardSurface)

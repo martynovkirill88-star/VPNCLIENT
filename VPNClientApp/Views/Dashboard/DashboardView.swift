@@ -94,10 +94,36 @@ public struct DashboardView: View {
                     }
                 }
                 
+                // Error Alert Banner if any
+                if let error = vpnManager.errorMessage {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(AppColors.red)
+                            .font(.system(size: 16))
+                            .padding(.top, 2)
+                        
+                        Text(error)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(AppColors.red)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                        
+                        Spacer()
+                    }
+                    .padding(12)
+                    .background(AppColors.red.opacity(0.12))
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(AppColors.red.opacity(0.3), lineWidth: 1)
+                    )
+                    .padding(.horizontal)
+                }
+                
                 // Active Server Card / Empty state
                 if let server = vpnManager.activeServer {
                     HStack(spacing: 12) {
-                        Text(server.countryCode == "RU" ? "🇷🇺" : "🇩🇪")
+                        Text(server.countryFlag)
                             .font(.system(size: 28))
                         
                         VStack(alignment: .leading, spacing: 2) {

@@ -91,6 +91,20 @@ public struct ServerConfig: Identifiable, Codable, Equatable, Hashable {
     public var isFavorite: Bool
     public var dateAdded: Date
     
+    public var countryFlag: String {
+        if name.contains("⚡") || name.contains("Автовыбор") {
+            return "⚡"
+        } else if countryCode == "RU" || isLTEBypass {
+            return "🇷🇺"
+        } else if countryCode == "NL" {
+            return "🇳🇱"
+        } else if countryCode == "FI" {
+            return "🇫🇮"
+        } else {
+            return "🇩🇪"
+        }
+    }
+    
     public init(
         id: UUID = UUID(),
         name: String,
@@ -239,14 +253,27 @@ public struct ServerConfig: Identifiable, Codable, Equatable, Hashable {
             path = grpcSettings["serviceName"] as? String
         }
         
-        let isLTE = remarks.contains("LTE") ||
-                    remarks.contains("CDN") ||
-                    remarks.contains("Selectel") ||
-                    remarks.contains("Яндекс") ||
-                    transport == .splithttp
+        let isForeign = remarks.contains("Германия") ||
+                        remarks.contains("Нидерланды") ||
+                        remarks.contains("Финляндия") ||
+                        remarks.contains("DE") ||
+                        remarks.contains("NL") ||
+                        remarks.contains("FI") ||
+                        remarks.contains("🇩🇪") ||
+                        remarks.contains("🇳🇱") ||
+                        remarks.contains("🇫🇮")
+        
+        let isLTE = !isForeign && (
+            remarks.contains("LTE") ||
+            remarks.contains("CDN") ||
+            remarks.contains("Selectel") ||
+            remarks.contains("Яндекс") ||
+            remarks.contains("Yandex") ||
+            remarks.contains("🇷🇺")
+        )
         
         var country = "DE"
-        if remarks.contains("🇷🇺") || remarks.contains("RU") || remarks.contains("Россия") {
+        if remarks.contains("🇷🇺") || remarks.contains("RU") || remarks.contains("Россия") || isLTE {
             country = "RU"
         } else if remarks.contains("🇩🇪") || remarks.contains("DE") || remarks.contains("Германия") {
             country = "DE"
@@ -322,12 +349,24 @@ public struct ServerConfig: Identifiable, Codable, Equatable, Hashable {
         let fp = queryMap["fp"] ?? "chrome"
         let flow = queryMap["flow"]
         
-        let isLTE = name.contains("LTE") ||
-                    name.contains("CDN") ||
-                    name.contains("Selectel") ||
-                    name.contains("Yandex") ||
-                    name.contains("Яндекс") ||
-                    transport == .splithttp
+        let isForeign = name.contains("Германия") ||
+                        name.contains("Нидерланды") ||
+                        name.contains("Финляндия") ||
+                        name.contains("DE") ||
+                        name.contains("NL") ||
+                        name.contains("FI") ||
+                        name.contains("🇩🇪") ||
+                        name.contains("🇳🇱") ||
+                        name.contains("🇫🇮")
+        
+        let isLTE = !isForeign && (
+            name.contains("LTE") ||
+            name.contains("CDN") ||
+            name.contains("Selectel") ||
+            name.contains("Yandex") ||
+            name.contains("Яндекс") ||
+            name.contains("🇷🇺")
+        )
         
         var proto: ServerProtocol = .vless
         if scheme == "hysteria2" || scheme == "hy2" {
@@ -339,7 +378,7 @@ public struct ServerConfig: Identifiable, Codable, Equatable, Hashable {
         }
         
         var country = "DE"
-        if name.contains("🇷🇺") || name.contains("RU") || name.contains("Россия") {
+        if name.contains("🇷🇺") || name.contains("RU") || name.contains("Россия") || isLTE {
             country = "RU"
         } else if name.contains("🇩🇪") || name.contains("DE") || name.contains("Германия") {
             country = "DE"
