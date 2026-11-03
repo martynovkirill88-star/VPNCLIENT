@@ -161,13 +161,18 @@ public final class VPNManager: ObservableObject {
                 if let encoded = try? JSONEncoder().encode(server) {
                     let req = IPCRequest(command: .switchServer, payload: encoded)
                     if let reqData = try? JSONEncoder().encode(req) {
-                        session.sendProviderMessage(reqData) { [weak self] respData in
-                            if respData == nil {
-                                // Fallback: restart tunnel with new config
-                                self?.connect(with: server)
+                        do {
+                            try session.sendProviderMessage(reqData) { [weak self] respData in
+                                if respData == nil {
+                                    // Fallback: restart tunnel with new config
+                                    self?.connect(with: server)
+                                }
                             }
+                            return
+                        } catch {
+                            connect(with: server)
+                            return
                         }
-                        return
                     }
                 }
             }
@@ -255,25 +260,29 @@ public final class VPNManager: ObservableObject {
         
         let req = IPCRequest(command: .getStats)
         if let reqData = try? JSONEncoder().encode(req) {
-            session.sendProviderMessage(reqData) { [weak self] responseData in
-                guard let self = self,
-                      let data = responseData,
-                      let resp = try? JSONDecoder().decode(IPCResponse.self, from: data),
-                      let stats = resp.stats else {
-                    self?.simulateLiveTraffic()
-                    return
+            do {
+                try session.sendProviderMessage(reqData) { [weak self] responseData in
+                    guard let self = self,
+                          let data = responseData,
+                          let resp = try? JSONDecoder().decode(IPCResponse.self, from: data),
+                          let stats = resp.stats else {
+                        self?.simulateLiveTraffic()
+                        return
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.downloadSpeedBps = stats.downloadSpeedBps
+                        self.uploadSpeedBps = stats.uploadSpeedBps
+                        self.totalDownloadedBytes = stats.totalDownloadedBytes
+                        self.totalUploadedBytes = stats.totalUploadedBytes
+                        TrafficStatsManager.shared.record(
+                            downBytesPerSec: stats.downloadSpeedBps,
+                            upBytesPerSec: stats.uploadSpeedBps
+                        )
+                    }
                 }
-                
-                DispatchQueue.main.async {
-                    self.downloadSpeedBps = stats.downloadSpeedBps
-                    self.uploadSpeedBps = stats.uploadSpeedBps
-                    self.totalDownloadedBytes = stats.totalDownloadedBytes
-                    self.totalUploadedBytes = stats.totalUploadedBytes
-                    TrafficStatsManager.shared.record(
-                        downBytesPerSec: stats.downloadSpeedBps,
-                        upBytesPerSec: stats.uploadSpeedBps
-                    )
-                }
+            } catch {
+                simulateLiveTraffic()
             }
         }
     }

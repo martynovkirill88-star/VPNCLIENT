@@ -177,3 +177,36 @@ public struct DashboardView: View {
         }
     }
 }
+
+public struct SpeedMetricCard: View {
+    let title: String
+    let speed: String
+    let total: String
+    let icon: String
+    let color: Color
+    
+    public var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                    .font(.system(size: 16))
+                
+                Text(title)
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .foregroundColor(AppColors.textSecondary)
+            }
+            
+            Text(speed)
+                .font(.system(size: 18, weight: .bold, design: .monospaced))
+                .foregroundColor(AppColors.textPrimary)
+            
+            Text("Всего: \(total)")
+                .font(.system(size: 11))
+                .foregroundColor(AppColors.textMuted)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .glassCard()
+    }
+}
