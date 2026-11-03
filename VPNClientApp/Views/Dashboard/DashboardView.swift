@@ -11,6 +11,9 @@ public struct DashboardView: View {
     @ObservedObject var vpnManager = VPNManager.shared
     @ObservedObject var networkMonitor = NetworkMonitor.shared
     @ObservedObject var smartRouting = SmartRoutingManager.shared
+    @ObservedObject var subManager = SubscriptionManager.shared
+    
+    @State private var showAlertNoSubscription = false
     
     public var body: some View {
         ScrollView {
@@ -62,7 +65,11 @@ public struct DashboardView: View {
                 
                 // Central Pulse Connection Button
                 PulseButton(vpnManager: vpnManager) {
-                    vpnManager.toggleConnection()
+                    if subManager.servers.isEmpty {
+                        showAlertNoSubscription = true
+                    } else {
+                        vpnManager.toggleConnection()
+                    }
                 }
                 .padding(.vertical, 10)
                 
@@ -76,6 +83,10 @@ public struct DashboardView: View {
                         Text(TrafficStatsManager.formatDuration(vpnManager.connectionDuration))
                             .font(.system(size: 14, weight: .semibold, design: .monospaced))
                             .foregroundColor(AppColors.textSecondary)
+                    } else if subManager.servers.isEmpty {
+                        Text("Добавьте подписку во вкладке «Подписка»")
+                            .font(.system(size: 13))
+                            .foregroundColor(AppColors.orange)
                     } else {
                         Text("Нажмите для подключения")
                             .font(.system(size: 13))
@@ -83,7 +94,7 @@ public struct DashboardView: View {
                     }
                 }
                 
-                // Active Server Card
+                // Active Server Card / Empty state
                 if let server = vpnManager.activeServer {
                     HStack(spacing: 12) {
                         Text(server.countryCode == "RU" ? "🇷🇺" : "🇩🇪")
@@ -102,6 +113,27 @@ public struct DashboardView: View {
                         Spacer()
                         
                         PingIndicator(pingMs: server.pingMs)
+                    }
+                    .padding()
+                    .glassCard()
+                    .padding(.horizontal)
+                } else {
+                    HStack(spacing: 12) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(AppColors.cyan)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Сервер не выбран")
+                                .font(.system(size: 15, weight: .bold))
+                                .foregroundColor(AppColors.textPrimary)
+                            
+                            Text("Вставьте ссылку во вкладке «Подписка»")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppColors.textSecondary)
+                        }
+                        
+                        Spacer()
                     }
                     .padding()
                     .glassCard()
@@ -136,38 +168,12 @@ public struct DashboardView: View {
             }
         }
         .background(AppColors.background.ignoresSafeArea())
-    }
-}
-
-public struct SpeedMetricCard: View {
-    let title: String
-    let speed: String
-    let total: String
-    let icon: String
-    let color: Color
-    
-    public var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundColor(color)
-                    .font(.system(size: 16))
-                
-                Text(title)
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    .foregroundColor(AppColors.textSecondary)
-            }
-            
-            Text(speed)
-                .font(.system(size: 18, weight: .bold, design: .monospaced))
-                .foregroundColor(AppColors.textPrimary)
-            
-            Text("Всего: \(total)")
-                .font(.system(size: 11))
-                .foregroundColor(AppColors.textMuted)
+        .alert(isPresented: $showAlertNoSubscription) {
+            Alert(
+                title: Text("Подписка не добавлена"),
+                message: Text("Перейдите во вкладку «Подписка» и вставьте вашу ссылку на серверы, чтобы начать."),
+                dismissButton: .default(Text("Понятно"))
+            )
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .glassCard()
     }
 }

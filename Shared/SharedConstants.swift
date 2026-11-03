@@ -2,8 +2,6 @@
 //  SharedConstants.swift
 //  VPNCLIENT
 //
-//  Created for iOS VPN Client.
-//
 
 import Foundation
 
@@ -27,8 +25,8 @@ public struct SharedConstants {
     public static let activeOutboundTagKey = "vpn_active_outbound_tag"
     public static let dnsProviderKey = "vpn_dns_provider"
     
-    // Default values
-    public static let defaultSubscriptionUrl = "https://sub1.chepushkavpn.fun/3qgSvJLYGfqzSv0x"
+    // Default values - EMPTY by default, user enters own subscription
+    public static let defaultSubscriptionUrl = ""
     public static let defaultUserAgent = "Happ/4.8.0 (iOS; VPNCLIENT)"
     
     // Notification names

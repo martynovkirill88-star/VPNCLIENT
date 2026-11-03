@@ -23,21 +23,34 @@ public final class SubscriptionManager: ObservableObject {
         self.userDefaults = UserDefaults(suiteName: SharedConstants.appGroupId) ?? UserDefaults.standard
         self.subscriptionUrl = userDefaults?.string(forKey: SharedConstants.subscriptionUrlKey) ?? SharedConstants.defaultSubscriptionUrl
         loadCachedServers()
-        
-        // If empty, populate with default initial servers
-        if servers.isEmpty {
-            loadDefaultPresetServers()
-        }
     }
     
     public func updateSubscriptionUrl(_ newUrl: String) {
-        subscriptionUrl = newUrl
-        userDefaults?.set(newUrl, forKey: SharedConstants.subscriptionUrlKey)
+        let trimmed = newUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        subscriptionUrl = trimmed
+        userDefaults?.set(trimmed, forKey: SharedConstants.subscriptionUrlKey)
+    }
+    
+    public func clearSubscription() {
+        subscriptionUrl = ""
+        servers = []
+        lastUpdated = nil
+        errorMessage = nil
+        userDefaults?.removeObject(forKey: SharedConstants.subscriptionUrlKey)
+        userDefaults?.removeObject(forKey: SharedConstants.serversListKey)
+        userDefaults?.removeObject(forKey: SharedConstants.lastSyncDateKey)
+        userDefaults?.removeObject(forKey: SharedConstants.activeServerKey)
     }
     
     public func fetchSubscription() async {
-        guard let url = URL(string: subscriptionUrl) else {
-            await MainActor.run { self.errorMessage = "Неверный URL подписки" }
+        let trimmedUrl = subscriptionUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedUrl.isEmpty else {
+            await MainActor.run { self.errorMessage = "Пожалуйста, вставьте ссылку на вашу подписку" }
+            return
+        }
+        
+        guard let url = URL(string: trimmedUrl) else {
+            await MainActor.run { self.errorMessage = "Неверный формат URL подписки" }
             return
         }
         
@@ -48,12 +61,13 @@ public final class SubscriptionManager: ObservableObject {
         
         var request = URLRequest(url: url)
         request.setValue(SharedConstants.defaultUserAgent, forHTTPHeaderField: "User-Agent")
-        request.timeoutInterval = 10
+        request.timeoutInterval = 12
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                throw URLError(.badServerResponse)
+                let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+                throw NSError(domain: "VPNCLIENT", code: code, userInfo: [NSLocalizedDescriptionKey: "Сервер подписки ответил ошибкой (HTTP \(code))"])
             }
             
             var rawText = String(data: data, encoding: .utf8) ?? ""
@@ -76,11 +90,10 @@ public final class SubscriptionManager: ObservableObject {
             }
             
             if parsedServers.isEmpty {
-                // If remote parsing had 0 valid links, keep defaults
-                throw NSError(domain: "VPNCLIENT", code: -1, userInfo: [NSLocalizedDescriptionKey: "В подписке не найдено подходящих серверов"])
+                throw NSError(domain: "VPNCLIENT", code: -1, userInfo: [NSLocalizedDescriptionKey: "В подписке не найдено подходящих серверов (VLESS/Hysteria/VMess)"])
             }
             
-            // Run initial ping check
+            // Test latency
             let pinged = await PingManager.shared.pingAll(servers: parsedServers)
             
             await MainActor.run {
@@ -88,6 +101,11 @@ public final class SubscriptionManager: ObservableObject {
                 self.lastUpdated = Date()
                 self.isLoading = false
                 self.saveServers()
+                
+                // If no active server yet, select first
+                if VPNManager.shared.activeServer == nil, let first = pinged.first {
+                    VPNManager.shared.setActiveServer(first)
+                }
             }
         } catch {
             await MainActor.run {
@@ -110,109 +128,5 @@ public final class SubscriptionManager: ObservableObject {
             self.servers = cached
             self.lastUpdated = userDefaults?.object(forKey: SharedConstants.lastSyncDateKey) as? Date
         }
-    }
-    
-    private func loadDefaultPresetServers() {
-        self.servers = [
-            ServerConfig(
-                name: "🇷🇺 LTE 3 (Selectel CDN)",
-                host: "78.159.252.30",
-                port: 443,
-                protocolType: .vless,
-                uuid: "33857ba0-be4c-47ea-8d4e-b52ad9b04f38",
-                transportType: .splithttp,
-                securityType: .tls,
-                sni: "ssp.chepushkavpn.fun",
-                path: "/selectel-cdn-sp",
-                hostHeader: "ssp.chepushkavpn.fun",
-                isLTEBypass: true,
-                countryCode: "RU",
-                pingMs: 24,
-                isFavorite: true
-            ),
-            ServerConfig(
-                name: "🇷🇺 LTE 1 (Яндекс CDN)",
-                host: "87.250.250.250",
-                port: 443,
-                protocolType: .vless,
-                uuid: "33857ba0-be4c-47ea-8d4e-b52ad9b04f38",
-                transportType: .splithttp,
-                securityType: .tls,
-                sni: "ydx.chepushkavpn.fun",
-                path: "/yandex-cdn-sp",
-                hostHeader: "ydx.chepushkavpn.fun",
-                isLTEBypass: true,
-                countryCode: "RU",
-                pingMs: 28,
-                isFavorite: true
-            ),
-            ServerConfig(
-                name: "🇷🇺 LTE 2 (Cloudflare CDN)",
-                host: "104.16.132.229",
-                port: 443,
-                protocolType: .vless,
-                uuid: "33857ba0-be4c-47ea-8d4e-b52ad9b04f38",
-                transportType: .splithttp,
-                securityType: .tls,
-                sni: "cf.chepushkavpn.fun",
-                path: "/cf-cdn-sp",
-                hostHeader: "cf.chepushkavpn.fun",
-                isLTEBypass: true,
-                countryCode: "RU",
-                pingMs: 32,
-                isFavorite: false
-            ),
-            ServerConfig(
-                name: "🇩🇪 Германия Direct (Reality)",
-                host: "177.3.214.235",
-                port: 443,
-                protocolType: .vless,
-                uuid: "33857ba0-be4c-47ea-8d4e-b52ad9b04f38",
-                flow: "xtls-rprx-vision",
-                transportType: .tcp,
-                securityType: .reality,
-                sni: "gateway.icloud.com",
-                fingerprint: "chrome",
-                publicKey: "x8r5N1e9L3q2W0zY4vB7mK6pT8uI1oP",
-                shortId: "abcd1234",
-                isLTEBypass: false,
-                countryCode: "DE",
-                pingMs: 38,
-                isFavorite: true
-            ),
-            ServerConfig(
-                name: "🇳🇱 Нидерланды High-Speed",
-                host: "185.220.101.5",
-                port: 443,
-                protocolType: .vless,
-                uuid: "33857ba0-be4c-47ea-8d4e-b52ad9b04f38",
-                flow: "xtls-rprx-vision",
-                transportType: .tcp,
-                securityType: .reality,
-                sni: "microsoft.com",
-                fingerprint: "chrome",
-                publicKey: "k7Q2p9m1N4v8W0zY4vB7mK6pT8uI1oP",
-                shortId: "deadbeef",
-                isLTEBypass: false,
-                countryCode: "NL",
-                pingMs: 44,
-                isFavorite: false
-            ),
-            ServerConfig(
-                name: "⚡ Hysteria 2 Turbo (DE)",
-                host: "177.3.214.235",
-                port: 8443,
-                protocolType: .hysteria2,
-                uuid: "33857ba0-be4c-47ea-8d4e-b52ad9b04f38",
-                transportType: .tcp,
-                securityType: .tls,
-                sni: "de-turbo.chepushkavpn.fun",
-                isLTEBypass: false,
-                countryCode: "DE",
-                pingMs: 41,
-                isFavorite: false
-            )
-        ]
-        saveServers()
     }
 }

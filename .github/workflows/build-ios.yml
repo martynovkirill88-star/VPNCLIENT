@@ -34,16 +34,20 @@ jobs:
 
       - name: Build Application & Tunnel Extension
         run: |
+          echo "Starting xcodebuild with Ad-Hoc signing..."
           xcodebuild clean build \
             -project VPNCLIENT.xcodeproj \
             -scheme VPNClientApp \
             -configuration Release \
             -destination "generic/platform=iOS" \
             -derivedDataPath ./DerivedData \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            AD_HOC_CODE_SIGNING_ALLOWED=YES
+            CODE_SIGNING_ALLOWED=YES \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            DEVELOPMENT_TEAM="" \
+            COMPILER_INDEX_STORE_ENABLE=NO
 
       - name: Package .IPA for iPhone
         run: |
@@ -54,10 +58,11 @@ jobs:
           APP_PATH=$(find ./DerivedData/Build/Products/Release-iphoneos -name "*.app" -maxdepth 1 | head -n 1)
           if [ -z "$APP_PATH" ]; then
             echo "❌ VPNClientApp.app not found in Release-iphoneos!"
+            ls -la ./DerivedData/Build/Products/ || true
             exit 1
           fi
           
-          echo "Found app at $APP_PATH"
+          echo "Found app at: $APP_PATH"
           cp -R "$APP_PATH" Payload/
           
           # Zip into .ipa
@@ -85,15 +90,16 @@ jobs:
             
             #### 🌟 Ключевые возможности:
             - **🧠 Умный автовыбор Wi-Fi / LTE**:
-              - На сотовой сети (LTE/5G) автоматически направляет трафик через CDN-серверы (`🇷🇺 LTE 1, 2, 3`) для обхода замедлений YouTube.
+              - На сотовой сети (LTE/5G) автоматически направляет трафик через CDN-серверы для обхода замедлений YouTube.
               - На Wi-Fi автоматически выбирает сервер с наименьшим пингом (`⚡ leastPing`).
+            - **📥 Чистая установка подписки**: пользователь сам вставляет свою ссылку во вкладке «Подписка» через удобную кнопку «Вставить из буфера».
             - **⚡ Поддержка современных протоколов**: VLESS Reality, SplitHTTP, Hysteria 2, gRPC.
             - **🎨 Стильный Cyber-Dark интерфейс**: спидометр, живой график, большая пульсирующая кнопка.
             - **🇷🇺 Обход российских сайтов**: банки, Госуслуги, VK и Яндекс работают напрямую.
             
             #### 📲 Способы установки .ipa на iPhone:
             1. **TrollStore** (для совместимых iOS версий): скачайте `VPNCLIENT.ipa` и откройте в TrollStore.
-            2. **Scarlet / Esign / Gbox** (установка прямо на телефоне через сертификат).
+            2. **Scarlet / Esign / Gbox** (установка прямо на телефоне через сертификат без ПК).
             3. **AltStore / Sideloadly** (установка через кабель с компьютера Mac или Windows).
           files: |
             VPNCLIENT.ipa

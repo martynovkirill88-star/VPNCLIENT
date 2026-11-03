@@ -13,7 +13,11 @@ settings:
     TARGETED_DEVICE_FAMILY: "1"
     ENABLE_PREVIEWS: YES
     DEVELOPMENT_TEAM: ""
-    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGNING_ALLOWED: YES
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGN_IDENTITY: "-"
+    AD_HOC_CODE_SIGNING_ALLOWED: YES
 
 targets:
   VPNClientApp:
@@ -36,6 +40,12 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.vpnclient.app
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGNING_ALLOWED: YES
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGN_IDENTITY: "-"
+        AD_HOC_CODE_SIGNING_ALLOWED: YES
+        DEVELOPMENT_TEAM: ""
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
@@ -60,4 +70,10 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.vpnclient.app.PacketTunnel
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGNING_ALLOWED: YES
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGN_IDENTITY: "-"
+        AD_HOC_CODE_SIGNING_ALLOWED: YES
+        DEVELOPMENT_TEAM: ""
         SKIP_INSTALL: YES
