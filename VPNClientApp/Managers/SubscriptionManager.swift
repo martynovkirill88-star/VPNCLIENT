@@ -60,7 +60,16 @@ public final class SubscriptionManager: ObservableObject {
         }
         
         var request = URLRequest(url: url)
-        request.setValue(SharedConstants.defaultUserAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue("Happ/4.8.0/AndroidTV/17921395329952009531", forHTTPHeaderField: "User-Agent")
+        
+        // Persistent Hardware ID to pass RemnaWave HWID protection
+        var hwid = userDefaults?.string(forKey: "vpn_device_hwid")
+        if hwid == nil || hwid!.isEmpty {
+            hwid = "1caf6c3e6cbc9d38"
+            userDefaults?.set(hwid, forKey: "vpn_device_hwid")
+        }
+        request.setValue(hwid!, forHTTPHeaderField: "x-hwid")
+        request.setValue(hwid!, forHTTPHeaderField: "X-HWID")
         request.timeoutInterval = 12
         
         do {
@@ -71,21 +80,37 @@ public final class SubscriptionManager: ObservableObject {
             }
             
             var rawText = String(data: data, encoding: .utf8) ?? ""
-            
-            // If Base64 encoded, decode it
-            if let decodedData = Data(base64Encoded: rawText.trimmingCharacters(in: .whitespacesAndNewlines), options: .ignoreUnknownCharacters),
-               let decodedString = String(data: decodedData, encoding: .utf8) {
-                rawText = decodedString
-            }
-            
-            let lines = rawText.components(separatedBy: CharacterSet.newlines)
             var parsedServers: [ServerConfig] = []
             
-            for line in lines {
-                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-                if trimmed.isEmpty || trimmed.hasPrefix("#") { continue }
-                if let server = ServerConfig.parse(uri: trimmed) {
-                    parsedServers.append(server)
+            // 1. Try parsing direct JSON Array (Happ/RemnaWave format)
+            if let jsonData = rawText.data(using: .utf8),
+               let jsonArray = try? JSONSerialization.jsonObject(with: jsonData) as? [[String: Any]] {
+                parsedServers = ServerConfig.parseFromHappJsonArray(jsonArray)
+            }
+            
+            // 2. Try Base64 decoding if not directly JSON
+            if parsedServers.isEmpty {
+                if let decodedData = Data(base64Encoded: rawText.trimmingCharacters(in: .whitespacesAndNewlines), options: .ignoreUnknownCharacters),
+                   let decodedString = String(data: decodedData, encoding: .utf8) {
+                    rawText = decodedString
+                    
+                    // Check if decoded payload is JSON
+                    if let jsonData = rawText.data(using: .utf8),
+                       let jsonArray = try? JSONSerialization.jsonObject(with: jsonData) as? [[String: Any]] {
+                        parsedServers = ServerConfig.parseFromHappJsonArray(jsonArray)
+                    }
+                }
+            }
+            
+            // 3. Try parsing line by line (vless:// / hysteria:// / vmess://)
+            if parsedServers.isEmpty {
+                let lines = rawText.components(separatedBy: CharacterSet.newlines)
+                for line in lines {
+                    let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if trimmed.isEmpty || trimmed.hasPrefix("#") { continue }
+                    if let server = ServerConfig.parse(uri: trimmed) {
+                        parsedServers.append(server)
+                    }
                 }
             }
             
@@ -93,7 +118,7 @@ public final class SubscriptionManager: ObservableObject {
                 throw NSError(domain: "VPNCLIENT", code: -1, userInfo: [NSLocalizedDescriptionKey: "В подписке не найдено подходящих серверов (VLESS/Hysteria/VMess)"])
             }
             
-            // Test latency
+            // Latency test
             let pinged = await PingManager.shared.pingAll(servers: parsedServers)
             
             await MainActor.run {
@@ -102,7 +127,7 @@ public final class SubscriptionManager: ObservableObject {
                 self.isLoading = false
                 self.saveServers()
                 
-                // If no active server yet, select first
+                // Set default active server
                 if VPNManager.shared.activeServer == nil, let first = pinged.first {
                     VPNManager.shared.setActiveServer(first)
                 }

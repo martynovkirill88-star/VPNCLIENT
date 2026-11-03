@@ -73,12 +73,9 @@ jobs:
           echo "Found app at: $APP_PATH"
           cp -R "$APP_PATH" Payload/
           
-          # Ensure NSExtension exists in PacketTunnel.appex/Info.plist
-          PLIST_PATH="Payload/VPNClientApp.app/PlugIns/PacketTunnel.appex/Info.plist"
-          if [ -f "$PLIST_PATH" ]; then
-            echo "Verifying and updating NSExtension in $PLIST_PATH..."
-            python3 Scripts/fix_plist.py "$PLIST_PATH"
-          fi
+          # Ensure Plists are correctly configured (NSExtension & UILaunchStoryboardName)
+          echo "Verifying and updating Info.plists in Payload/VPNClientApp.app..."
+          python3 Scripts/fix_plist.py "Payload/VPNClientApp.app"
           
           # Zip into .ipa
           zip -r -9 VPNCLIENT.ipa Payload

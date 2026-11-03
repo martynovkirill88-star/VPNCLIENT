@@ -135,6 +135,156 @@ public struct ServerConfig: Identifiable, Codable, Equatable, Hashable {
         self.dateAdded = dateAdded
     }
     
+    /// Parses an array of Happ / RemnaWave JSON objects
+    public static func parseFromHappJsonArray(_ jsonArray: [[String: Any]]) -> [ServerConfig] {
+        var result: [ServerConfig] = []
+        for dict in jsonArray {
+            if let srv = parseHappObject(dict) {
+                result.append(srv)
+            }
+        }
+        return result
+    }
+    
+    public static func parseHappObject(_ dict: [String: Any]) -> ServerConfig? {
+        let remarks = dict["remarks"] as? String ?? dict["name"] as? String ?? "Сервер"
+        guard let outbounds = dict["outbounds"] as? [[String: Any]], let ob = outbounds.first else {
+            return nil
+        }
+        
+        let protoStr = (ob["protocol"] as? String ?? "vless").lowercased()
+        let streamSettings = ob["streamSettings"] as? [String: Any] ?? [:]
+        let netStr = (streamSettings["network"] as? String ?? "tcp").lowercased()
+        let secStr = (streamSettings["security"] as? String ?? "none").lowercased()
+        
+        var host = ""
+        var port = 443
+        var uuid = ""
+        var flow: String? = nil
+        
+        if protoStr == "vless" || protoStr == "vmess" {
+            let settings = ob["settings"] as? [String: Any] ?? [:]
+            if let vnext = settings["vnext"] as? [[String: Any]], let firstVnext = vnext.first {
+                host = firstVnext["address"] as? String ?? ""
+                port = firstVnext["port"] as? Int ?? 443
+                if let users = firstVnext["users"] as? [[String: Any]], let firstUser = users.first {
+                    uuid = firstUser["id"] as? String ?? ""
+                    flow = firstUser["flow"] as? String
+                }
+            }
+        } else if protoStr == "hysteria" || protoStr == "hysteria2" {
+            let settings = ob["settings"] as? [String: Any] ?? [:]
+            host = settings["server"] as? String ?? settings["address"] as? String ?? ""
+            port = settings["port"] as? Int ?? 443
+            let hysteriaSettings = streamSettings["hysteriaSettings"] as? [String: Any] ?? [:]
+            uuid = hysteriaSettings["auth"] as? String ?? settings["auth"] as? String ?? ""
+        }
+        
+        guard !host.isEmpty else { return nil }
+        
+        // Transport
+        let transport: TransportType
+        if netStr == "xhttp" || netStr == "splithttp" {
+            transport = .splithttp
+        } else if netStr == "grpc" {
+            transport = .grpc
+        } else if netStr == "ws" {
+            transport = .ws
+        } else {
+            transport = .tcp
+        }
+        
+        // Security
+        let security: SecurityType
+        if secStr == "reality" {
+            security = .reality
+        } else if secStr == "tls" {
+            security = .tls
+        } else {
+            security = .none
+        }
+        
+        // Reality / TLS details
+        var sni: String? = nil
+        var pbk: String? = nil
+        var sid: String? = nil
+        var fp: String? = "chrome"
+        
+        if security == .reality {
+            let realitySettings = streamSettings["realitySettings"] as? [String: Any] ?? [:]
+            sni = realitySettings["serverName"] as? String
+            pbk = realitySettings["publicKey"] as? String
+            sid = realitySettings["shortId"] as? String
+            fp = realitySettings["fingerprint"] as? String ?? "chrome"
+        } else if security == .tls {
+            let tlsSettings = streamSettings["tlsSettings"] as? [String: Any] ?? [:]
+            sni = tlsSettings["serverName"] as? String
+        }
+        
+        // Path and Host Header
+        var path: String? = nil
+        var hostHeader: String? = nil
+        if transport == .splithttp {
+            let xhttpSettings = streamSettings["xhttpSettings"] as? [String: Any] ?? [:]
+            path = xhttpSettings["path"] as? String
+            hostHeader = xhttpSettings["host"] as? String
+        } else if transport == .ws {
+            let wsSettings = streamSettings["wsSettings"] as? [String: Any] ?? [:]
+            path = wsSettings["path"] as? String
+            if let headers = wsSettings["headers"] as? [String: String] {
+                hostHeader = headers["Host"]
+            }
+        } else if transport == .grpc {
+            let grpcSettings = streamSettings["grpcSettings"] as? [String: Any] ?? [:]
+            path = grpcSettings["serviceName"] as? String
+        }
+        
+        let isLTE = remarks.contains("LTE") ||
+                    remarks.contains("CDN") ||
+                    remarks.contains("Selectel") ||
+                    remarks.contains("Яндекс") ||
+                    transport == .splithttp
+        
+        var country = "DE"
+        if remarks.contains("🇷🇺") || remarks.contains("RU") || remarks.contains("Россия") {
+            country = "RU"
+        } else if remarks.contains("🇩🇪") || remarks.contains("DE") || remarks.contains("Германия") {
+            country = "DE"
+        } else if remarks.contains("🇳🇱") || remarks.contains("NL") || remarks.contains("Нидерланды") {
+            country = "NL"
+        } else if remarks.contains("🇫🇮") || remarks.contains("FI") || remarks.contains("Финляндия") {
+            country = "FI"
+        }
+        
+        var proto: ServerProtocol = .vless
+        if protoStr == "hysteria" || protoStr == "hysteria2" {
+            proto = .hysteria2
+        } else if protoStr == "vmess" {
+            proto = .vmess
+        } else if protoStr == "trojan" {
+            proto = .trojan
+        }
+        
+        return ServerConfig(
+            name: remarks,
+            host: host,
+            port: port,
+            protocolType: proto,
+            uuid: uuid,
+            flow: flow,
+            transportType: transport,
+            securityType: security,
+            sni: sni,
+            fingerprint: fp,
+            publicKey: pbk,
+            shortId: sid,
+            path: path,
+            hostHeader: hostHeader,
+            isLTEBypass: isLTE,
+            countryCode: country
+        )
+    }
+    
     /// Parses vless:// or hysteria2:// or vmess:// URI
     public static func parse(uri: String) -> ServerConfig? {
         let trimmed = uri.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -172,11 +322,11 @@ public struct ServerConfig: Identifiable, Codable, Equatable, Hashable {
         let fp = queryMap["fp"] ?? "chrome"
         let flow = queryMap["flow"]
         
-        // Auto-detect LTE CDN bypass server
         let isLTE = name.contains("LTE") ||
                     name.contains("CDN") ||
                     name.contains("Selectel") ||
                     name.contains("Yandex") ||
+                    name.contains("Яндекс") ||
                     transport == .splithttp
         
         var proto: ServerProtocol = .vless
