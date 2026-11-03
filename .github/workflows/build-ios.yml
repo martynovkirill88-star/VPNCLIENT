@@ -73,6 +73,26 @@ jobs:
           echo "Found app at: $APP_PATH"
           cp -R "$APP_PATH" Payload/
           
+          # Verify and ensure NSExtension exists in PacketTunnel.appex/Info.plist
+          PLIST_PATH="Payload/VPNClientApp.app/PlugIns/PacketTunnel.appex/Info.plist"
+          if [ -f "$PLIST_PATH" ]; then
+            echo "Checking and setting NSExtension in $PLIST_PATH..."
+            python3 -c "
+import plistlib
+with open('$PLIST_PATH', 'rb') as f:
+    d = plistlib.load(f)
+
+d['CFBundlePackageType'] = 'XPC!'
+d['NSExtension'] = {
+    'NSExtensionPointIdentifier': 'com.apple.networkextension.packet-tunnel',
+    'NSExtensionPrincipalClass': 'PacketTunnel.PacketTunnelProvider'
+}
+with open('$PLIST_PATH', 'wb') as f:
+    plistlib.dump(d, f)
+print('Successfully verified NSExtension:', d.get('NSExtension'))
+"
+          fi
+          
           # Zip into .ipa
           zip -r -9 VPNCLIENT.ipa Payload
           echo "✅ VPNCLIENT.ipa created successfully!"
